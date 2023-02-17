@@ -2,10 +2,13 @@ const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+ctx.font = '50px Impact'
 
 let timeToNextRaven = 0;
 let ravenInterval = 500;
 let lastTime = 0;
+
+let score = 0;
 
 
 let ravens = [];
@@ -48,15 +51,18 @@ class Raven {
     }
 }
 
-const raven = new Raven();
-
+function drawScore(){
+    ctx.fillStyle = 'black';
+    ctx.fillText('Score: ' + score, 50, 75)
+    ctx.fillStyle = 'white';
+    ctx.fillText('Score: ' + score, 53, 78)
+}
 
 function animate(timestamp){
     ctx.clearRect(0,0,canvas.width, canvas.height)
     let deltaTime = timestamp - lastTime;
     lastTime = timestamp;
     timeToNextRaven += deltaTime
-
     if(timeToNextRaven > ravenInterval){
         ravens.push(new Raven);
         timeToNextRaven = 0;
@@ -64,6 +70,7 @@ function animate(timestamp){
     [...ravens].forEach(object => object.update(deltaTime));
     [...ravens].forEach(object => object.draw());
     ravens = ravens.filter(object => !object.markedForDeletion);
+    drawScore();
     requestAnimationFrame(animate)
 }
 animate(0);
