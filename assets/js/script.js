@@ -2,6 +2,11 @@ const canvas = document.getElementById('canvas1');
 const ctx = canvas.getContext('2d');
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+const collisionCanvas = document.getElementById('collisionCanvas');
+const collisionCanvasCtx = collisionCanvas.getContext('2d' ,{ willReadFrequently: true });
+collisionCanvas.width = window.innerWidth;
+collisionCanvas.height = window.innerHeight;
+
 ctx.font = '50px Impact'
 
 let timeToNextRaven = 0;
@@ -30,6 +35,8 @@ class Raven {
     this.maxFrame = 4;
     this.timeSinceFlap = 0;
     this.flapInterval = Math.random() * 50 + 50;
+    this.randomColor = [Math.floor(Math.random() * 255),Math.floor(Math.random() * 255),Math.floor(Math.random() * 255)]
+    this.color = 'rgb(' + this.randomColor[0] + ',' + this.randomColor[1] + ',' + this.randomColor[2] + ')';
     }
     update(deltaTime){
         if(this.y < 0 || this.y > canvas.height - this.height ){
@@ -48,6 +55,8 @@ class Raven {
     }   
     draw(){
         ctx.drawImage(this.image, this.frame * this.spriteWidth, 0, this.spriteWidth, this.spriteHeight, this.x, this.y, this.width, this.height)
+        collisionCanvasCtx.fillStyle = this.color;
+        collisionCanvasCtx.fillRect(this.x, this.y, this.width, this.height)
     }
 }
 
@@ -59,11 +68,20 @@ function drawScore(){
 }
 
 window.addEventListener('click', function(e){
-    const detectColor = ctx.getImageData(e.x, e.y, 1, 1)
-    console.log(detectColor)
-})
+    const detectColor = collisionCanvasCtx.getImageData(e.x, e.y, 1, 1)
+    const pc = detectColor.data;
+    console.log(pc)
+    ravens.forEach(object => {
+        if(object.randomColor[0] === pc[0] && object.randomColor[0] === pc[0] && object.randomColor[0] === pc[0]) {
+            object.markedForDeletion = true;
+            console.log(object.color + object.markedForDeletion)
+            score++
+           }
+        })
+    })
 
 function animate(timestamp){
+    collisionCanvasCtx.clearRect(0,0,collisionCanvas.width,collisionCanvas.height);
     ctx.clearRect(0,0,canvas.width, canvas.height)
     let deltaTime = timestamp - lastTime;
     lastTime = timestamp;
@@ -71,6 +89,9 @@ function animate(timestamp){
     if(timeToNextRaven > ravenInterval){
         ravens.push(new Raven);
         timeToNextRaven = 0;
+        ravens.sort(function(a,b){
+            return a.width = b.width;
+        })
     }
     [...ravens].forEach(object => object.update(deltaTime));
     [...ravens].forEach(object => object.draw());
