@@ -60,6 +60,26 @@ class Raven {
     }
 }
 
+class Target{
+    constructor(x,y){
+    this.x = x;
+    this.y = y;
+    this.width = 50;
+    this.height = 50;
+    this.image = new Image();
+    this.image.src = './assets/images/targetwhite.png';
+    }
+    update(){
+        this.x = this.x
+        this.y = this.y
+    }
+    draw(){
+        ctx.drawImage(this.image, this.x - this.width/2, this.y - this.height/2, this.width, this.height)
+    }   
+}
+
+const target = new Target(0,0)
+
 function drawScore(){
     ctx.fillStyle = 'black';
     ctx.fillText('Score: ' + score, 50, 75)
@@ -70,14 +90,18 @@ function drawScore(){
 window.addEventListener('click', function(e){
     const detectColor = collisionCanvasCtx.getImageData(e.x, e.y, 1, 1)
     const pc = detectColor.data;
-    console.log(pc)
     ravens.forEach(object => {
         if(object.randomColor[0] === pc[0] && object.randomColor[0] === pc[0] && object.randomColor[0] === pc[0]) {
             object.markedForDeletion = true;
-            console.log(object.color + object.markedForDeletion)
             score++
            }
         })
+    })
+
+window.addEventListener('mousemove', function(e){
+        target.x = e.x
+        target.y = e.y
+     
     })
 
 function animate(timestamp){
@@ -96,6 +120,8 @@ function animate(timestamp){
     [...ravens].forEach(object => object.update(deltaTime));
     [...ravens].forEach(object => object.draw());
     ravens = ravens.filter(object => !object.markedForDeletion);
+    target.update();
+    target.draw();
     drawScore();
     requestAnimationFrame(animate)
 }
